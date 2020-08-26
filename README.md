@@ -1,4 +1,4 @@
-walds - Worms Armageddon Language files DeSnowflaker
+## walds - Worms Armageddon Language files DeSnowflaker
 
 An over-engineered tool to correct silly political correctness pandering changes made to the Steam / GoG language files of Worms Armageddon.
 
