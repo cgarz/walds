@@ -11,8 +11,8 @@ For example, in English.txt the following will be changed:
 It should run with python and the built in modules alone. However if pefile is installed it will use that to get the WA.exe version.
 Tested on Linux and Wine.
 
-This pairs well with the [Missing Content zip file](https://drive.google.com/uc?authuser=0&id=0B6A_ITzSjsF3ZDRTN2ZKUUdzdDA) from here:  
-https://steamcommunity.com/sharedfiles/filedetails/?id=156231406
+This pairs well with the [Missing Content zip file](https://drive.google.com/file/d/0B6A_ITzSjsF3ZDRTN2ZKUUdzdDA) from here:  
+https://steamfix.blogspot.com/2013/06/worms-armageddon-install-missing.html
 
 Changes in the steam/GoG version are listed here:  
 https://worms2d.info/Steam_release_(Worms_Armageddon)
