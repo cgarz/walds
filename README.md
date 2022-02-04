@@ -11,7 +11,7 @@ For example, in English.txt the following will be changed:
 It should run with python and the built in modules alone. However if pefile is installed it will use that to get the WA.exe version.
 Tested on Linux and Wine.
 
-This pairs well with the [Missing Content zip file](https://drive.google.com/file/d/0B6A_ITzSjsF3ZDRTN2ZKUUdzdDA) from here:  
+This pairs well with the [Missing Content zip file](https://drive.google.com/file/d/0B6A_ITzSjsF3ZDRTN2ZKUUdzdDA/view?usp=sharing&resourcekey=0-7PDyMiaj82bEMou7DT55dQ) from here:  
 https://steamfix.blogspot.com/2013/06/worms-armageddon-install-missing.html
 
 Alternatively you can use the `--restore-media` option to automatically restore the content from GitHub. Including restoration of "Pervo Laugh.wav" which is not restored with the missing content zip file.
