@@ -88,10 +88,14 @@ def get_exe_version(exe_path):
 
     # FileInfo is now a list of lists since some PE files may have multiple VS_VERSION_INFO entries. Only parsing first.
     for entry in pe.FileInfo[0]:
-        if hasattr(entry, 'StringTable'):
-            for st_entry in entry.StringTable:
-                if VERSION_FIELD in st_entry.entries:
-                    return st_entry.entries[VERSION_FIELD].decode()
+        if not hasattr(entry, 'StringTable'):
+            continue
+
+        for st_entry in entry.StringTable:
+            if VERSION_FIELD not in st_entry.entries:
+                continue
+
+            return st_entry.entries[VERSION_FIELD].decode()
     return False
 
 
@@ -145,8 +149,7 @@ def fix_launguage_files(lang_dir, no_backup):
     file_paths = sorted([f for f in os.listdir('.') if f.lower().endswith('.txt')])
     for file_path in file_paths:
         changes = False
-        title, title_pos, title_line = ('', '', '')
-        header, header_pos, header_line = ('', '', '')
+        title = title_pos = title_line = header = header_pos = header_line = ''
 
         with open(file_path, mode='rt', encoding=LANGUAGE_FILE_ENCODING) as f:
             lines = f.read().splitlines()
@@ -206,20 +209,21 @@ def fix_launguage_files(lang_dir, no_backup):
 def main():
     """Use argparse to get the launch arguments and carry out the requested action. Validate manual input and fall back
        to automatic detection if it is invalid. Fail with error if language folder cannot be found."""
-    parser = ArgumentParser(description='WALDS (Worms Armageddon Language file DeSnowflaker). An over-engineered tool'
-                                        ' to correct silly political correctness pandering changes made to the Steam /'
-                                        ' GoG language files of Worms Armageddon.')
-    parser.add_argument('-p', '--wa-path', default=None, nargs='?', type=str,
-                        help='The full Worms Armageddon installation folder path. Default is to autodetect.'
-                             ' (Example: "{}")'.format(DEFAULT_INSTALL_PATHS[0]))
-    parser.add_argument('-l', '--lang-dirname', default=None, nargs='?', type=str,
-                        help='The language directory to work on. Named after current W:A version.'
-                             ' Default is to autodetect latest. (Examples: 3.8 or 3.7.2.1)')
-    parser.add_argument('--no-backup', action='store_true',
-                        help='Disables the automatic backup of edited language files.')
-    parser.add_argument('--restore', action='store_true',
-                        help='Restores all modified language files from their backup file if available.')
-    args = parser.parse_args()
+    parser = ArgumentParser(description=(
+        'WALDS (Worms Armageddon Language file DeSnowflaker). An over-engineered tool to correct silly political'
+        'correctness pandering changes made to the Steam GoG language files of Worms Armageddon.'))
+    parser.add_argument('-p', '--wa-path', default=None, nargs='?', type=str, help=(
+        'The full Worms Armageddon installation folder path. Default is to autodetect.'
+        ' (Example: "{}")'.format(DEFAULT_INSTALL_PATHS[0])))
+    parser.add_argument('-l', '--lang-dirname', default=None, nargs='?', type=str, help=(
+        'The language directory to work on. Named after current W:A version. Default is to autodetect latest.'
+        ' (Examples: 3.8 or 3.7.2.1)'))
+    parser.add_argument('--no-backup', action='store_true', help='Disables the auto backup of edited language files.')
+    parser.add_argument('--restore-lang-files', action='store_true', help=(
+        'Restores all modified language files from their backup file if available.'))
+    parser.add_argument('--restore-media', action='store_true', help=(
+        'Restores the soundbanks, flags and fanfares that were removed in order to pander to snowflakes.'))
+    args = parser.parse_args(('--restore-media', '-p', '/home/cgar/Wine Prefixes/Worms Armageddon/drive_c/Worms Armageddon'))
 
     install_path = None
     if args.wa_path:
@@ -248,7 +252,7 @@ def main():
         parser.error('Could not resolve language directory. Is W:A installed properly?'
                      'Try manually specifying with --lang-dirname')
 
-    if args.restore:
+    if args.restore_lang_files:
         restore_backups(lang_dir_path)
     else:
         fix_launguage_files(lang_dir_path, args.no_backup)
