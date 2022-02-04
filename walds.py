@@ -310,7 +310,7 @@ def main():
         'Restores all modified language files from their backup file if available.'))
     parser.add_argument('--restore-media', action='store_true', help=(
         'Restores the soundbanks, flags and fanfares that were removed in order to pander to snowflakes.'))
-    args = parser.parse_args(('--restore-media', '-p', '/home/cgar/Wine Prefixes/Worms Armageddon/drive_c/Worms Armageddon'))
+    args = parser.parse_args()
 
     install_path = None
     if args.wa_path:
