@@ -3,6 +3,8 @@
 import os
 import shlex
 import shutil
+from shutil import copy2
+from requests import get
 from argparse import ArgumentParser
 
 PROPER_HEADER_FIELD    = 'TT_TEAMLIST_TRAINING_5_CD'
@@ -25,6 +27,27 @@ DEFAULT_INSTALL_PATHS = (
     r'C:\Program Files\Steam\steamapps\common\Worms Armageddon',
     r'C:\GOG Games\Worms Armageddon'
 )
+
+FLAGS_SOURCE_PREFIX = 'https://github.com/Carlmundo/WA-Plus/raw/master/Patch/User/Flags'
+FLAG_NAMES = ('Aphex.bmp', 'Imperial.bmp', 'Kamikaze.bmp', 'Red Cross.bmp')
+
+SOUNDBANK_SOURCE_PREFIX = 'https://github.com/Carlmundo/WA-Plus/raw/master/Patch/DATA/User/Speech'
+SOUNDBANK_FILES_COMMON = (
+    'amazing.wav', 'boring.wav', 'brilliant.wav', 'bummer.wav', 'bungee.wav', 'byebye.wav', 'collect.wav',
+    'comeonthen.wav', 'coward.wav', 'dragonpunch.wav', 'drop.wav', 'excellent.wav', 'fatality.wav', 'fireball.wav',
+    'fire.wav', 'firstblood.wav', 'flawless.wav', 'goaway.wav', 'grenade.wav', 'hello.wav', 'hurry.wav',
+    'illgetyou.wav', 'incoming.wav', 'jump1.wav', 'jump2.wav', 'justyouwait.wav', 'kamikaze.wav', 'laugh.wav',
+    'leavemealone.wav', 'missed.wav', 'nooo.wav', 'ohdear.wav', 'oinutter.wav', 'oops.wav', 'orders.wav', 'ouch.wav',
+    'ow1.wav', 'ow2.wav', 'ow3.wav', 'perfect.wav', 'revenge.wav', 'runaway.wav', 'stupid.wav', 'takecover.wav',
+    'traitor.wav', 'victory.wav', 'watchthis.wav', 'whatthe.wav', 'yessir.wav', 'youllregretthat.wav'
+)
+SOUNDBANKS = {
+    'Team17 Test': SOUNDBANK_FILES_COMMON + ('ooff1.wav', 'ooff2.wav', 'ooff3.wav', 'uh-oh.wav')}
+SOUNDBANKS.update({
+    'Jock':        SOUNDBANKS['Team17 Test'],
+    'The Raj':     SOUNDBANKS['Team17 Test'] + ('walk-compress.wav', 'walk-expand.wav'),
+    'Rasta':       SOUNDBANK_FILES_COMMON + ('oof1.wav', 'oof2.wav', 'oof3.wav', 'uhoh.wav', 'noo.wav'),
+    'Angry Scots': tuple(f.upper() for f in SOUNDBANKS['Team17 Test']) + ('WOBBLE.WAV',)})
 
 
 def get_install_folder(hist):
@@ -206,6 +229,70 @@ def fix_launguage_files(lang_dir, no_backup):
             print('No fix needed:', file_path)
 
 
+def restore_soundbanks(install_path):
+    speech_dir = os.path.join(install_path, 'DATA', 'User', 'Speech')
+    if not os.path.isdir(speech_dir):
+        print('ERROR: Speech dir not found. Quitting')
+        exit(1)
+
+    existing_speech_folders = [d for d in os.listdir(speech_dir) if os.path.isdir(os.path.join(speech_dir, d))]
+
+    for name, files in SOUNDBANKS.items():
+        if name in existing_speech_folders:
+            print(f'"{name}" already in speech folder, skipping...')
+            continue
+
+        os.mkdir(os.path.join(speech_dir, name))
+        for file in files:
+            file_path = os.path.join(speech_dir, name, file)
+            file_href = '/'.join((SOUNDBANK_SOURCE_PREFIX, name, file))
+            with open(file_path, 'wb') as f:
+                print('Downloading and saving:', os.path.join('DATA', 'User', 'Speech', name, file))
+                f.write(get(file_href).content)
+
+
+def restore_flags(install_path):
+    flags_dir = os.path.join(install_path, 'User', 'Flags')
+    if not os.path.isdir(flags_dir):
+        print('ERROR: Flags dir not found. Quitting')
+        exit(1)
+
+    existing_flag_files = [f for f in os.listdir(flags_dir) if os.path.isfile(os.path.join(flags_dir, f))]
+    for name in FLAG_NAMES:
+        if name in existing_flag_files:
+            print(f'"{name}" already in flag folder, skipping...')
+            continue
+
+        file_path = os.path.join(flags_dir, name)
+        file_href = '/'.join((FLAGS_SOURCE_PREFIX, name))
+        with open(file_path, 'wb') as f:
+            print('Downloading and saving:', os.path.join('User', 'Flags', name))
+            f.write(get(file_href).content)
+
+
+def restore_fanfare(install_path):
+    fanfare_dir = os.path.join(install_path, 'DATA', 'User', 'Fanfare')
+    if not os.path.isdir(fanfare_dir):
+        print('ERROR: Flags dir not found. Quitting')
+        exit(1)
+
+    proper_name = 'Pervo Laugh.wav'
+    snowflake_name = 'Crazy Laugh.wav'
+    proper_path = os.path.join(fanfare_dir, proper_name)
+    snowflake_path = os.path.join(fanfare_dir, snowflake_name)
+
+    if not os.path.isfile(proper_path):
+        print(f'Properly named file "{proper_name}" missing.')
+        if os.path.isfile(snowflake_path):
+            print(f'Restoring from snowflake named file "{snowflake_name}"')
+            copy2(snowflake_path, proper_path)
+    if not os.path.isfile(snowflake_path):
+        print(f'Snowflake named file "{snowflake_name}" missing.')
+        if os.path.isfile(proper_path):
+            print(f'Duplicating from proper named file "{proper_name}"')
+            copy2(proper_path, snowflake_path)
+
+
 def main():
     """Use argparse to get the launch arguments and carry out the requested action. Validate manual input and fall back
        to automatic detection if it is invalid. Fail with error if language folder cannot be found."""
@@ -256,7 +343,12 @@ def main():
         restore_backups(lang_dir_path)
     else:
         fix_launguage_files(lang_dir_path, args.no_backup)
-    
+
+    if args.restore_media:
+        restore_soundbanks(install_path)
+        restore_flags(install_path)
+        restore_fanfare(install_path)
+
 
 if __name__ == '__main__':
     main()
