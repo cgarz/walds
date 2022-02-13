@@ -90,10 +90,10 @@ def request_install_folder(hist):
             path = os.path.expandvars(os.path.expanduser(path))
         except (KeyboardInterrupt, EOFError) as e:
             print(f'\nGot {e.__class__.__name__}. Quitting')
-            exit(0)
+            nt_pause_exit(0)
         if path.upper() in ('Q', 'QUIT', 'EXIT', 'CANCEL'):
             print('OK. Quitting')
-            exit(0)
+            nt_pause_exit(0)
         if os.path.isfile(os.path.join(path, WA_EXE_FILE)):
             return path
         print(f'ERROR: WA.exe file not found in: "{path}"')
@@ -233,7 +233,7 @@ def restore_soundbanks(install_path):
     speech_dir = os.path.join(install_path, 'DATA', 'User', 'Speech')
     if not os.path.isdir(speech_dir):
         print('ERROR: Speech dir not found. Quitting')
-        exit(1)
+        nt_pause_exit(1)
 
     existing_speech_folders = [d for d in os.listdir(speech_dir) if os.path.isdir(os.path.join(speech_dir, d))]
 
@@ -255,7 +255,7 @@ def restore_flags(install_path):
     flags_dir = os.path.join(install_path, 'User', 'Flags')
     if not os.path.isdir(flags_dir):
         print('ERROR: Flags dir not found. Quitting')
-        exit(1)
+        nt_pause_exit(1)
 
     existing_flag_files = [f for f in os.listdir(flags_dir) if os.path.isfile(os.path.join(flags_dir, f))]
     for name in FLAG_NAMES:
@@ -274,7 +274,7 @@ def restore_fanfare(install_path):
     fanfare_dir = os.path.join(install_path, 'DATA', 'User', 'Fanfare')
     if not os.path.isdir(fanfare_dir):
         print('ERROR: Flags dir not found. Quitting')
-        exit(1)
+        nt_pause_exit(1)
 
     proper_name = 'Pervo Laugh.wav'
     snowflake_name = 'Crazy Laugh.wav'
@@ -291,6 +291,14 @@ def restore_fanfare(install_path):
         if os.path.isfile(proper_path):
             print(f'Duplicating from proper named file "{proper_name}"')
             copy2(proper_path, snowflake_path)
+
+
+def nt_pause_exit(exit_code):
+    if os.name == 'nt':
+        print('Press enter to close window...')
+        input()
+
+    exit(exit_code)
 
 
 def main():
@@ -356,7 +364,6 @@ if __name__ == '__main__':
     except Exception:
         import traceback
         traceback.print_exc()
+        nt_pause_exit(1)
         
-    if os.name == 'nt':
-        print('Press enter to close...')
-        input()
+    nt_pause_exit(0)
