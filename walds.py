@@ -352,3 +352,6 @@ def main():
 
 if __name__ == '__main__':
     main()
+    if os.name == 'nt':
+        print('Press enter to close...')
+        input()
