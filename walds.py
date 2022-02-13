@@ -351,7 +351,12 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except Exception:
+        import traceback
+        traceback.print_exc()
+        
     if os.name == 'nt':
         print('Press enter to close...')
         input()
