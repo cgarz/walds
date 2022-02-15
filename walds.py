@@ -295,6 +295,7 @@ def restore_fanfare(install_path):
 
 def nt_pause_exit(exit_code):
     if os.name == 'nt':
+        from sys import exit
         print('Press enter to close window...')
         input()
 
