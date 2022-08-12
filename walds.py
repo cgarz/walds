@@ -25,7 +25,8 @@ BACKUP_FILE_SUFFIX = '.bak'
 DEFAULT_INSTALL_PATHS = (
     r'C:\Program Files (x86)\Steam\steamapps\common\Worms Armageddon',
     r'C:\Program Files\Steam\steamapps\common\Worms Armageddon',
-    r'C:\GOG Games\Worms Armageddon'
+    r'C:\GOG Games\Worms Armageddon',
+    r'C:\Program Files (x86)\GOG Galaxy\Games\Worms Armageddon'
 )
 
 FLAGS_SOURCE_PREFIX = 'https://github.com/Carlmundo/WA-Plus/raw/master/Patch/User/Flags'
