@@ -274,7 +274,7 @@ def restore_flags(install_path):
 def restore_fanfare(install_path):
     fanfare_dir = os.path.join(install_path, 'DATA', 'User', 'Fanfare')
     if not os.path.isdir(fanfare_dir):
-        print('ERROR: Flags dir not found. Quitting')
+        print('ERROR: Fanfare dir not found. Quitting')
         nt_pause_exit(1)
 
     proper_name = 'Pervo Laugh.wav'
@@ -308,7 +308,7 @@ def main():
        to automatic detection if it is invalid. Fail with error if language folder cannot be found."""
     parser = ArgumentParser(description=(
         'WALDS (Worms Armageddon Language file DeSnowflaker). An over-engineered tool to correct silly political'
-        'correctness pandering changes made to the Steam GoG language files of Worms Armageddon.'))
+        'correctness pandering changes made to the Steam/GOG language files of Worms Armageddon.'))
     parser.add_argument('-p', '--wa-path', default=None, nargs='?', type=str, help=(
         'The full Worms Armageddon installation folder path. Default is to autodetect.'
         ' (Example: "{}")'.format(DEFAULT_INSTALL_PATHS[0])))
